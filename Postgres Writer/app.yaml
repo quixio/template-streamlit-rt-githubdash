@@ -1,0 +1,31 @@
+name: MotherDuck Write
+language: python
+variables:
+  - name: input
+    inputType: InputTopic
+    description: Name of the input topic to listen to.
+    defaultValue: processed_data
+    required: false
+  - name: MOTHERDUCK_TOKEN
+    inputType: Secret
+    description: ''
+    defaultValue: mdtoken
+    required: false
+  - name: MOTHERDUCK_DATABASE
+    inputType: FreeText
+    description: ''
+    defaultValue: my_db
+    required: false
+  - name: CONSUMER_GROUP_NAME
+    inputType: FreeText
+    description: ''
+    defaultValue: md-write-test
+    required: false
+  - name: db_table_name
+    inputType: FreeText
+    description: ''
+    defaultValue: user_events
+    required: false
+dockerfile: dockerfile
+runEntryPoint: main.py
+defaultFile: main.py
