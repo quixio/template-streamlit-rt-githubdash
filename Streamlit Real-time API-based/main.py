@@ -67,7 +67,7 @@ while True:
     max_scale = max_count * 1.01
 
     # Create a Plotly figure
-    fig = px.bar(df, x='displayname', y='event_count', title="Event Counts",
+    fig = px.bar(df, x='displayname', y='event_count', title="Current Top 10 active GitHub Users by event count",
                  range_y=[min_scale, max_scale])
 
     # Style the chart
@@ -80,7 +80,6 @@ while True:
     # Display the Plotly chart in Streamlit using st.plotly_chart
     chart_placeholder.plotly_chart(fig, use_container_width=True)
 
-    st.markdown("**Current Top 10 active GitHub Users by event count**")
     # Display the dataframe as a table
     table_placeholder.table(df)
 
