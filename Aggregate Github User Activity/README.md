@@ -1,30 +1,33 @@
-# Starter transformation
+# Aggregate Github User Activity
 
-[This project](https://github.com/quixio/quix-samples/tree/main/python/transformations/starter_transformation) is an example of how to transform data on the fly between source and destination.
+This service keeps a running counts the events detect for each GitHub user using stateful calcuations. 
 
-The default implementation subscribes to data from the source and publishes to the destination as-well-as printing content to console output. 
+It connects to Redpanda or Kafka and reads from the input topic (the raw events from the GitHub Firehose), processes them, and sends the aggregations to the output topic for the Postgres WWriter to pick up.
 
-Modify the Python code to transform your data on the fly.
+This is the main function that does the calculation:
 
-## How to run
+```python
+# Group (aka "Re-key") the streaming data by displayname so we can count the events
+sdf = sdf.group_by("displayname")
 
-Create a [Quix](https://portal.platform.quix.ai/self-sign-up?xlink=github) account or log-in and visit the Samples to use this project.
+# Counts the number of events by displayname
+def count_messages(value: dict, state: State):
+    current_total = state.get('event_count', default=0)
+    current_total += 1
+    state.set('event_count', current_total)
+    return current_total
+```
 
-Clicking `Edit code` on the Sample, forks the project to your own Git repo so you can customize it before deploying.
+It then sends messages to output topic. Here's a preview of the log output to give you an idea of the message format:
 
-## Environment variables
-
-The code sample uses the following environment variables:
-
-- **input**: Name of the input topic to listen to.
-- **output**: Name of the output topic to write to.
-
-## Contribute
-
-Submit forked projects to the Quix [GitHub](https://github.com/quixio/quix-samples) repo. Any new project that we accept will be attributed to you and you'll receive $200 in Quix credit.
-
-## Open source
-
-This project is open source under the Apache 2.0 license and available in our [GitHub](https://github.com/quixio/quix-samples) repo.
-
-Please star us and mention us on social to show your appreciation.
+```
+INFO:__main__:Sent row: {'event_count': 209, 'displayname': 'heimuhaha'}
+INFO:__main__:Sent row: {'event_count': 1, 'displayname': 'spanky-the-elfbot'}
+INFO:__main__:Sent row: {'event_count': 1, 'displayname': 'qulop'}
+INFO:__main__:Sent row: {'event_count': 1, 'displayname': 'truongsinh'}
+INFO:__main__:Sent row: {'event_count': 2, 'displayname': 'GeorgyKomkov'}
+INFO:__main__:Sent row: {'event_count': 1, 'displayname': 'ImamHaris'}
+INFO:__main__:Sent row: {'event_count': 1, 'displayname': 'yaroslavsysoiev'}
+INFO:__main__:Sent row: {'event_count': 146, 'displayname': 'shullp05'}
+```
+The Postgres Writer the reads these messages and inserts them into the Postgres DB.
