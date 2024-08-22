@@ -30,4 +30,4 @@ INFO:__main__:Sent row: {'event_count': 1, 'displayname': 'ImamHaris'}
 INFO:__main__:Sent row: {'event_count': 1, 'displayname': 'yaroslavsysoiev'}
 INFO:__main__:Sent row: {'event_count': 146, 'displayname': 'shullp05'}
 ```
-The Postgres WWriter the reads these messages and inserts them into the Postgres DB.
+The Postgres Writer the reads these messages and inserts them into the Postgres DB.
