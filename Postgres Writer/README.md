@@ -22,6 +22,24 @@ sdf = sdf.update(lambda val: insert_data(conn, val), stateful=False)
 ```
 * **NOTE**: Right now, the column names are hard-coded, so if you want to insert data with another structure or set of column names,  you need to update this query.
 
+# Environment variables
+
+Here are the default environment variabes which you can find in the `.env` file.
+
+```
+input = event-counts
+PG_HOST = localhost
+PG_PORT = 5433
+PG_USER = root
+PG_DATABASE = test_db
+PG_SCHEMA = public
+PG_TABLE = event_counts
+PG_PASSWORD = root
+Quix__Broker__Address = localhost:19092
+```
+
+# Output
+
 Here's a preview of the log output:
 
 ```
