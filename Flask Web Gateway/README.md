@@ -14,7 +14,7 @@ Run the main application:
 
 ## Default Environment variables
 
-You can find these in the accomapnying `.env` file.
+You can find these in the accompanying `.env` file.
 
 ```
 input = event-counts
