@@ -1,30 +1,37 @@
-# Starter transformation
+# Aggregate Github User Activity
 
-[This project](https://github.com/quixio/quix-samples/tree/main/python/destinations/starter_destination) is an example of how to transform data on the fly between source and destination.
+This service reads from a Kafka topic and writes the entries to a Postgres db. 
 
-The default implementation subscribes to data from the source topic and publishes to your destination as-well-as printing content to console output. 
+It connects to Redpanda or Kafka and reads from the input topic (the aggregated event counts), and inserts them into a database table.
 
-Modify the Python code to publish to your chosen destination(s) on the fly.
+This is the main function that does the insertions
 
-## How to run
+```python
+def insert_data(conn, msg):
+    # Insert data into the DB and if the page_id exists, update the count in the existing row
+    with conn.cursor() as cursor:
+        cursor.execute(f'''
+            INSERT INTO {tablename} (displayname, event_count ) VALUES (%s, %s)
+            ON CONFLICT (displayname)
+            DO UPDATE SET event_count = EXCLUDED.event_count;
+        ''', (msg['displayname'], msg['event_count']))
+        conn.commit()
+    logger.info(f"Wrote record: {msg}")
 
-Create a [Quix](https://portal.platform.quix.ai/self-sign-up?xlink=github) account or log-in and visit the Samples to use this project.
+sdf = sdf.update(lambda val: insert_data(conn, val), stateful=False)
+```
+* **NOTE**: Right now, the column names are hard-coded, so if you want to insert data with another structure or set of column names,  you need to update this query.
 
-Clicking `Edit code` on the Sample, forks the project to your own Git repo so you can customize it before deploying.
+Here's a preview of the log output:
 
-## Environment variables
+```
+INFO:__main__:Wrote record: {'event_count': 94, 'displayname': 'swa-runner-app'}
+INFO:__main__:Wrote record: {'event_count': 2, 'displayname': 'hmrc-web-operations'}
+INFO:__main__:Wrote record: {'event_count': 1, 'displayname': 'pranshu05'}
+INFO:__main__:Wrote record: {'event_count': 1, 'displayname': 'SinghAstra'}
+INFO:__main__:Wrote record: {'event_count': 1, 'displayname': 'Timidaniel'}
+INFO:__main__:Wrote record: {'event_count': 18, 'displayname': 'JonathansManoel'}
+INFO:__main__:Wrote record: {'event_count': 5, 'displayname': 'codacy-staging'}
+INFO:__main__:Wrote record: {'event_count': 95, 'displayname': 'swa-runner-app'}
+```
 
-The code sample uses the following environment variables:
-
-- **input**: Name of the input topic to listen to.
-- **output**: Name of the output topic to write to.
-
-## Contribute
-
-Submit forked projects to the Quix [GitHub](https://github.com/quixio/quix-samples) repo. Any new project that we accept will be attributed to you and you'll receive $200 in Quix credit.
-
-## Open source
-
-This project is open source under the Apache 2.0 license and available in our [GitHub](https://github.com/quixio/quix-samples) repo.
-
-Please star us and mention us on social to show your appreciation.
