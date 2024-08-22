@@ -1,37 +1,42 @@
-# Streamlit
+# Streamlit Dashboard
 
-[This project](https://github.com/quixio/quix-samples/tree/main/python/destinations/streamlit) is an example of how to run a real time Streamlit dashboard within Quix
+This service polls the data API and renders the resulting data in a Streamlit Dashboard with a simple chart and table. When running, it is accessable under: http://localhost:8031.
 
-Send any JSON data to this dashboard via a Kafka topic.
+It connects to Redpanda or Kafka and reads from the input topic (the aggregated event counts), and inserts them into a database table.
 
-You only need to edit the dashboard code if you want to update the layout, otherwise it works out of the box as a quick way to visualize your data.
+This is the main function that gets the data from the API:
 
-Note that the code expects a timestamp in one of these columns: "timestamp", "Timestamp", "time", "ts"
+```python
+## Function to get data from the API
+def get_data():
+    print(f"[{datetime.now()}] Fetching data from API...")
+    response = requests.get(api_url)
+    data = response.json()
+    df = pd.DataFrame(data)
 
-## How to run
+    try:
+        # Reorder columns
+        # df = df[['page_id', 'count']]
+        df = df[['displayname', 'event_count']]
+    except:
+        logger.info("No data yet...")
 
-Create a [Quix](https://portal.platform.quix.ai/self-sign-up?xlink=github) account or log-in and visit the Samples to use this project.
+    return df
+```
+* **NOTE**: Right now, the column names are hard-coded, so if you want to insert data with another structure or set of column names,  you need to update this query.
 
-Clicking `Deploy` on the Sample, deploys a pre-built container in Quix. Complete the environment variables to configure the container.
+# Environment variables
 
-Clicking `Edit code` on the Sample, forks the project to your own Git repo so you can customize it before deploying.
+Here is the one default environment variabe which you can find in the `.env` file.
 
-## Environment variables
+```
+API_URL = http://localhost/events
+```
 
-This code sample uses the following environment variables:
+# Output
 
-- **input**: The topic to stream data from (`f1-data`)
+Here's a preview of the dashboard:
 
-## Requirements
+![GitHubstats](https://github.com/user-attachments/assets/c3f1c9d9-e48e-470c-902f-9152be57aec1)
 
-Deploy the `Demo Data` source from the Quix Code Samples. This will stream Codemasters&reg; F1&reg; 2019 telemetry data into a topic called `f1-data`
 
-## Contribute
-
-Submit forked projects to the Quix [GitHub](https://github.com/quixio/quix-samples) repo. Any new project that we accept will be attributed to you and you'll receive $200 in Quix credit.
-
-## Open source
-
-This project is open source under the Apache 2.0 license and available in our [GitHub](https://github.com/quixio/quix-samples) repo.
-
-Please star us and mention us on social to show your appreciation.
