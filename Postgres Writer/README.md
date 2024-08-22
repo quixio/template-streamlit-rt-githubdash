@@ -8,7 +8,7 @@ This is the main function that does the insertions
 
 ```python
 def insert_data(conn, msg):
-    # Insert data into the DB and if the page_id exists, update the count in the existing row
+    # Insert data into the DB and if the displayname exists, update the count in the existing row
     with conn.cursor() as cursor:
         cursor.execute(f'''
             INSERT INTO {tablename} (displayname, event_count ) VALUES (%s, %s)
