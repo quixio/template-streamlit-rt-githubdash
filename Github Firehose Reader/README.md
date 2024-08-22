@@ -20,14 +20,7 @@ Run the main application:
 You can find these in the accompanying `.env` file.
 
 ```
-input = event-counts
-PG_HOST = localhost
-PG_PORT = 5433
-PG_USER = root
-PG_DATABASE = test_db
-PG_SCHEMA = public
-PG_TABLE = event_counts
-PG_PASSWORD = root
+output = github-data
 Quix__Broker__Address = localhost:19092
 ```
 
