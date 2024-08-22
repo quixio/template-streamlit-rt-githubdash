@@ -4,9 +4,8 @@ from waitress import serve
 import psycopg2
 import logging
 
-# for local dev, load env vars from a .env file
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv() ### for local dev, outside of docker, load env vars from a .env file
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -15,6 +14,7 @@ app = Flask(__name__)
 
 # Replace with your PostgreSQL connection details
 pg_host = os.environ['PG_HOST']
+pg_port = os.getenv('PG_PORT','5432')
 pg_db = os.environ['PG_DATABASE']
 pg_user = os.environ['PG_USER']
 pg_password = os.environ['PG_PASSWORD']
@@ -23,6 +23,7 @@ pg_table = os.environ['PG_TABLE']
 # Establish a connection to PostgreSQL
 conn = psycopg2.connect(
     host=pg_host,
+    port=pg_port,
     database=pg_db,
     user=pg_user,
     password=pg_password

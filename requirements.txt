@@ -1,0 +1,11 @@
+quixstreams
+python-dotenv
+flask
+flask_cors
+waitress
+psycopg2-binary
+pandas
+numpy
+requests-sse
+streamlit
+plotly

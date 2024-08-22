@@ -3,14 +3,11 @@ import logging
 import os
 from quixstreams import Application
 from quixstreams.kafka.configuration import ConnectionConfig
-
 from dotenv import load_dotenv
-load_dotenv() ### for local dev, outside of docker, load env vars from a .env file
 
+load_dotenv() # for local dev, load env vars from a .env file
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-logger.info(f"Using broker address: {os.getenv('Quix__Broker__Address')}")
 
 # Initialize the Quix Application with the connection configuration
 app = Application(consumer_group="count-consumer-v1",
@@ -21,18 +18,14 @@ sdf = app.dataframe(input_topic) # Turn the data from the input topic into a str
 
 # PostgreSQL connection details
 pg_host = os.environ['PG_HOST']
-pg_port = os.getenv('PG_PORT','5432')
 pg_db = os.environ['PG_DATABASE']
 pg_user = os.environ['PG_USER']
 pg_password = os.environ['PG_PASSWORD']
 tablename = os.getenv("PG_TABLE","page_counts") # The name of the table we want to write to
 
-logger.info(f"Using Postgres server address: {pg_host}, port '{pg_port}',database '{pg_db}', user '{pg_user}', user '{pg_password}', table '{tablename }'")
-
 # Establish a connection to PostgreSQL
 conn = psycopg2.connect(
     host=pg_host,
-    port=pg_port,
     database=pg_db,
     user=pg_user,
     password=pg_password
@@ -52,8 +45,8 @@ try:
         if not table_exists:
             cursor.execute(f'''
                 CREATE TABLE {tablename} (
-                    displayname VARCHAR UNIQUE,
-                    event_count INTEGER
+                    page_id VARCHAR UNIQUE,
+                    count INTEGER
                 );
             ''')
         conn.commit()
@@ -65,10 +58,10 @@ def insert_data(conn, msg):
     # Insert data into the DB and if the page_id exists, update the count in the existing row
     with conn.cursor() as cursor:
         cursor.execute(f'''
-            INSERT INTO {tablename} (displayname, event_count ) VALUES (%s, %s)
-            ON CONFLICT (displayname)
-            DO UPDATE SET event_count = EXCLUDED.event_count;
-        ''', (msg['displayname'], msg['event_count']))
+            INSERT INTO {tablename} (page_id, count) VALUES (%s, %s)
+            ON CONFLICT (page_id)
+            DO UPDATE SET count = EXCLUDED.count;
+        ''', (msg['page_id'], msg['action_count']))
         conn.commit()
     logger.info(f"Wrote record: {msg}")
 

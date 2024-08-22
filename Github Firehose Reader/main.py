@@ -5,6 +5,13 @@ import os
 from quixstreams import Application
 from requests_sse import EventSource
 
+from dotenv import load_dotenv
+load_dotenv() ### for local dev, outside of docker, load env vars from a .env file
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+logger.info(f"Using broker address: {os.getenv('Quix__Broker__Address')}")
 
 def handle_stats(stats_msg: str) -> None:
     stats = json.loads(stats_msg)

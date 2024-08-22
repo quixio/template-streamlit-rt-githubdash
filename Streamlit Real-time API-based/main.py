@@ -6,9 +6,9 @@ import os
 import logging
 from datetime import datetime
 import plotly.express as px
-# for local dev, load env vars from a .env file
+
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv() ### for local dev, outside of docker, load env vars from a .env file
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -38,10 +38,10 @@ def get_cached_data():
     return get_data()
 
 # Streamlit UI
-st.title("Real-time Dashboard Example Using Streamlit and Quix")
-st.markdown("This dashboard reads from a table via an API, which is being continuously updated by a sink process in Quix Cloud. It then displays a dynamically updating Bokeh chart and table underneath.")
-st.markdown("In Quix Cloud, we are:\n * Generating synthetic user logs\n * Streaming the data to Kafka\n * Reading from Kafka and aggregating the actions per page\n * Sinking the page view counts (which are continuously updating) to MotherDuck\n\n ")
-st.markdown("What users could learn: How to read from a real-time source and apply some kind of transformation to the data before bringing it into Streamlit (using only Python)")
+st.title("Real-time Dashboard for GitHub Data using Streamlit,Flask and Quix")
+st.markdown("This dashboard reads from a table via an API, which is being continuously updated by a Quix Streams sink process running in Docker. It then displays a dynamically updating Plotly chart and table underneath.")
+st.markdown("In the backend, there are services that:\n * Read from the GitHub Firehose \n * Stream the event data to Redpanda\n * Read from Redpanda and aggregate the events per GitHub user\n * Sinking the page event counts (which are continuously updating) to PostGres\n\n ")
+st.markdown("Take a closer a look at the [back-end code](https://github.com/quixio/template-streamlit-rt-githubdash), and learn how to read from a real-time source and apply some kind of transformation to the data before bringing it into Streamlit (using only Python)")
 
 # Placeholder for the bar chart and table
 chart_placeholder = st.empty()

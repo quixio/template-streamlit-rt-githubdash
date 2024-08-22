@@ -1,14 +1,22 @@
 import os
+import logging
 from quixstreams import Application, State
 from quixstreams.kafka.configuration import ConnectionConfig
-from dotenv import load_dotenv
 
-# for local dev, load env vars from a .env file
-load_dotenv()
+from dotenv import load_dotenv
+load_dotenv() ### for local dev, outside of docker, load env vars from a .env file
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+logger.info(f"Using broker address: {os.getenv('Quix__Broker__Address')}")
 
 # Initialize the Quix Application with the connection configuration
 app = Application(consumer_group=os.getenv("consumer_group_name","default-consumer-group"),
                   auto_offset_reset="earliest")
+
+logger.info(f"Clearing previous state first...")
+app.clear_state() # Clear residual state due to previous errors
 
 input_topic = app.topic(os.getenv("input","raw_data"))
 output_topic = app.topic(os.getenv("output","processed_data"))
@@ -43,7 +51,7 @@ sdf = sdf[["event_count"]] # Cut down our streaming dataframe to consist of JUST
 sdf = sdf.apply(add_key_to_payload, metadata=True) # Adding the key (displayname) to the payload so that its easier to see what user each event count belongs to.
 sdf = sdf.filter(lambda row: row['displayname'] not in ['github-actions', 'direwolf-github', 'dependabot']) # Filter out what looks like bot accounts from the data
 
-sdf = sdf.update(lambda row: print(f"Received row: {row}")) # Print each row so that we can see what we're going to send to the downstream topic
+sdf = sdf.update(lambda row: logger.info(f"Received row: {row}")) # Print each row so that we can see what we're going to send to the downstream topic
 
 # Produce our processed streaming dataframe to the downstream topic "event_counts"
 sdf = sdf.to_topic(output_topic)
