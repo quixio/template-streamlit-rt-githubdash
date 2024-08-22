@@ -4,11 +4,28 @@
 
 ## How to run
 
+Install the requirements first:
 
-## Environment variables
+`pip install -r requirements.txt`
 
-The code sample uses the following environment variables:
+Run the main application:
 
-- **output**: This is the output topic for hello world data.
+`python main.py`
+
+## Default Environment variables
+
+You can find these in the accomapnying `.env` file.
+
+```
+input = event-counts
+PG_HOST = localhost
+PG_PORT = 5433
+PG_USER = root
+PG_DATABASE = test_db
+PG_SCHEMA = public
+PG_TABLE = event_counts
+PG_PASSWORD = root
+Quix__Broker__Address = localhost:19092
+```
 
 
